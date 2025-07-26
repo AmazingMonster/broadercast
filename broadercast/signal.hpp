@@ -1,8 +1,8 @@
 // Copyright 2025 Feng Mofan
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef BROADERCAST_TELLER_H
-#define BROADERCAST_TELLER_H
+#ifndef BROADERCAST_SIGNAL_H
+#define BROADERCAST_SIGNAL_H
 
 #include "conceptrodon/functivore/concepts/member_function_pointer_probe.hpp"
 #include "conceptrodon/mouldivore/concepts/confess.hpp"
@@ -11,6 +11,7 @@
 #include <concepts>
 #include <functional>
 #include <type_traits>
+#include <map>
 #include <utility>
 
 namespace Broadercast {
@@ -18,25 +19,38 @@ namespace Broadercast {
 template
 <
     template<typename...> class FunctionWrapper=std::function,
-    template<typename...> class TheVector=std::vector
+    template<typename...> class TheMap=std::map
 >
-struct Teller
+struct Signal
 {
     template<typename...Parameters>
     struct ProtoMold
     {
         using TypeSignature = Conceptrodon::Functivore::ApplyReturnType<void>::Mold<Parameters...>;
         using Function = FunctionWrapper<Conceptrodon::Functivore::ApplyReturnType<void>::Mold<std::remove_reference_t<Parameters>&...>>;
-        using Vector = TheVector<Function>;
+        using Map = TheMap<size_t, Function>;
+
+        ProtoMold(): counter{0} {}
 
         template <typename Execute>
         requires std::invocable<Execute, Parameters...>
-        void connect(Execute&& exec)
-        { vector.emplace_back(wrap(std::forward<Execute>(exec))); }
+        size_t connect(Execute&& exec)
+        {
+            counter++;
+            map.emplace(counter, wrap(std::forward<Execute>(exec)));
+            return counter;
+        }
 
         template <typename ObjectPointer, typename Execute>
-        void connect(ObjectPointer&& object_pointer, Execute&& exec)
-        { vector.emplace_back(wrap(std::forward<ObjectPointer>(object_pointer), std::forward<Execute>(exec))); }
+        size_t connect(ObjectPointer&& object_pointer, Execute&& exec)
+        {
+            counter++;
+            map.emplace(counter++, wrap(std::forward<ObjectPointer>(object_pointer), std::forward<Execute>(exec)));
+            return counter;
+        }
+
+        auto disconnect(size_t key)
+        { return map.erase(key); }
 
         template <typename Activate>
         Function wrap(Activate&& activate)
@@ -155,13 +169,14 @@ struct Teller
         requires std::invocable<TypeSignature, Args...>
         void execute(Args&&...args)
         {
-            for (auto& slot : vector)
+            for (auto& slot : map)
             {
-                slot(args...);
+                slot.second(args...);
             }
         }
         
-        Vector vector;
+        size_t counter;
+        Map map;
     };
 
     template<typename...Args>
