@@ -1,17 +1,17 @@
 // Copyright 2024 Feng Mofan
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef BROADERCAST_TESTS_UNIT_SIGNAL_ORDINARY_H
-#define BROADERCAST_TESTS_UNIT_SIGNAL_ORDINARY_H
+#ifndef BROADERCAST_TESTS_UNIT_APT_SIGNAL_LVALUE_REFERENCE_H
+#define BROADERCAST_TESTS_UNIT_APT_SIGNAL_LVALUE_REFERENCE_H
 
-#include "broadercast/signal.hpp"
+#include "broadercast/apt_signal.hpp"
 #include <iostream>
 #include <memory>
 #include <ostream>
 
 
 namespace Broadercast {
-namespace TestSignalOrdinary {
+namespace TestAptSignalLvalueReference {
     
 
 struct Argument
@@ -35,13 +35,13 @@ struct Caller
     Caller(Caller const && caller)
     { std::cout << "Caller move constructed" << std::endl; }
 
-    bool operator()(Argument p, bool r)
+    bool operator()(Argument const & p, bool r)
     {    
         std::cout << "Function object called" << std::endl;
         return r;
     }
 
-    bool fun(Argument p, bool r)
+    bool fun(Argument const & p, bool r)
     { 
         std::cout << "Pointer to member function called" << std::endl;
         return r; 
@@ -67,7 +67,7 @@ struct CallerPtr
     C* c;
 };
 
-inline bool fun(Argument p, bool r)
+inline bool fun(Argument const & p, bool r)
 { 
     std::cout << "Function called" << std::endl;
     return r; 
@@ -75,7 +75,7 @@ inline bool fun(Argument p, bool r)
 
 inline auto Lambda
 {
-    [](Argument p, bool r)
+    [](Argument const & p, bool r)
     { 
         std::cout << "Lambda called" << std::endl;
         return r; 
@@ -84,7 +84,7 @@ inline auto Lambda
 
 inline void test()
 {
-    Signal<>::Mold<Argument, bool> signal {};
+    AptSignal<Argument const &, bool> signal {};
 
     Caller caller{};
     Caller* c_ptr {&caller};
@@ -129,6 +129,7 @@ inline void test()
             std::cout << pair.first << ": " << pair.second << std::endl;
         }
 
+
         std::cin >> v;
         if (v == 'L' || v == 'l')
         {
@@ -152,7 +153,7 @@ inline void test()
             signal.disconnect(x);
             instruction.erase(x);
         } 
-    }    
+    }
 }
 
 }}
