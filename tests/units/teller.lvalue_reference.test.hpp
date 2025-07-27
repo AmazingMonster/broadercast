@@ -1,8 +1,8 @@
 // Copyright 2024 Feng Mofan
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef BROADERCAST_TESTS_UNIT_ACTIVATOR_LVALUE_REFERENCE_H
-#define BROADERCAST_TESTS_UNIT_ACTIVATOR_LVALUE_REFERENCE_H
+#ifndef BROADERCAST_TESTS_UNIT_TELLER_LVALUE_REFERENCE_H
+#define BROADERCAST_TESTS_UNIT_TELLER_LVALUE_REFERENCE_H
 
 #include "broadercast/teller.hpp"
 #include <iostream>
@@ -11,7 +11,7 @@
 
 
 namespace Broadercast {
-namespace TestActivatorLvalueReference {
+namespace TestTellerLvalueReference {
     
 
 struct Argument
@@ -109,7 +109,6 @@ inline void test()
         Argument a {};
 
         char v;
-        bool r;
         
         std::cout << "0: Rvalue function object" << std::endl;
         std::cout << "1: Lvalue function object" << std::endl;
@@ -122,21 +121,21 @@ inline void test()
         std::cout << "8: Rvalue pointer to object like and pointer to member function" << std::endl;
         std::cout << "9: Lvalue pointer to object like and pointer to member function" << std::endl;
 
-        std::cin >> v >> r;
+        std::cin >> v;
         if (v == 'L' || v == 'l')
         {
             std::cout << "Lvalue argument" << std::endl;
-            teller.execute(a, r);
+            teller.execute(a, true);
         }
         else if (v == 'P' || v == 'p')
         {
             std::cout << "Prvalue argument" << std::endl;
-            teller.execute(Argument{}, r);
+            teller.execute(Argument{}, true);
         }
         else if (v == 'R' || v == 'r')
         {
             std::cout << "Rvalue reference argument" << std::endl;
-            teller.execute(std::move(a), r);
+            teller.execute(std::move(a), true);
         }
     }    
 }

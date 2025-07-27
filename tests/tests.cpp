@@ -3,10 +3,14 @@
 
 #include "tests/units/teller.ordinary.test.hpp"
 #include "tests/units/teller.lvalue_reference.test.hpp"
+#include "tests/units/signal.ordinary.test.hpp"
+#include "tests/units/signal.lvalue_reference.test.hpp"
 
 int main()
 {
-    //Broadercast::TestActivatorOrdinary::test();
-    Broadercast::TestActivatorLvalueReference::test();
+    //Broadercast::TestTellerOrdinary::test();
+    //Broadercast::TestTellerLvalueReference::test();
+    //Broadercast::TestSignalOrdinary::test();
+    Broadercast::TestSignalLvalueReference::test();
     return 0; 
 }
